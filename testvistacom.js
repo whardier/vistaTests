@@ -92,7 +92,7 @@ const doConfig = async () => {
     console.error(error)
     error_log(error)
   }
-  
+
   const ws = fs.createWriteStream("results.csv");
   fastcsv
     .write(comRes, { headers: false })

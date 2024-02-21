@@ -13,30 +13,30 @@ function chkContext(stationNo, duz) {
   return new Promise(function (resolve, reject) {
     axios.post(config.VistaApiX.tokenUrl,
       {
-        "key":config.KeyX
-            }).then(function (data) {
-              console.log
-              axios.post(config.VistaApiX.url+'/vista-sites/'+stationNo+'/users/'+duz+'/rpc/invoke',
-                {
-                  "context": "DVBA CAPRI GUI",
-                  "rpc": "DDR LISTER",
-                  "jsonResult": false,
-                  "parameters" : [
-                    {
-                      "namedArray": {
-                        "FILE":"19",
-                           "FIELDS":"@;.01",
-                           "FLAGS":"IP",
-                           "XREF":"B",
-                           "MAX":"1",
-                           "FROM":"CDSP RPC CONTEX",
-                           "PART":"CDSP RPC CONTEXT"
-                       }   
-                  }
-                  ]
+        "key": config.KeyX
+      }).then(function (data) {
+        console.log
+        axios.post(config.VistaApiX.url + '/vista-sites/' + stationNo + '/users/' + duz + '/rpc/invoke',
+          {
+            "context": "DVBA CAPRI GUI",
+            "rpc": "DDR LISTER",
+            "jsonResult": false,
+            "parameters": [
+              {
+                "namedArray": {
+                  "FILE": "19",
+                  "FIELDS": "@;.01",
+                  "FLAGS": "IP",
+                  "XREF": "B",
+                  "MAX": "1",
+                  "FROM": "CDSP RPC CONTEX",
+                  "PART": "CDSP RPC CONTEXT"
+                }
               }
-              
-              , { headers: { 'authorization': 'Bearer ' + data.data.data.token }, }
+            ]
+          }
+
+          , { headers: { 'authorization': 'Bearer ' + data.data.data.token }, }
         ).then(function (data) {
 
           var jsonData = data.data;
@@ -47,7 +47,7 @@ function chkContext(stationNo, duz) {
             respArr.forEach(function (e) {
               var rec = e.split("^")
               if (rec.length > 1)
-               
+
                 rec.push(stationNo)
               dataArr.push(rec)
             })
@@ -57,7 +57,7 @@ function chkContext(stationNo, duz) {
       })
       .catch((err) => {
         console.log(err)
-         });
+      });
   })
 }
 function getStations() {
@@ -78,7 +78,7 @@ function getStations() {
   })
 }
 var comRes = []
-var count=0
+var count = 0
 function addRes(comInfo) {
   comRes.push(...comInfo)
 }
@@ -87,30 +87,30 @@ const doConfig = async () => {
   try {
     var stations = await getStations()
     console.log(stations.length)
-    
-    for (var i = 0; i < stations.length; i++) {
-    
-        console.log(stations[i].stationNo)
-        
-        var context = await chkContext(stations[i].stationNo, stations[i].accountDuz)
-        if (context) {
-        
-          var test=context[1]
-     
-          if (test[1] == 'CDSP RPC CONTEXT'){
-            console.log(test)
-            addRes(context)
-            count++
 
-          }
+    for (var i = 0; i < stations.length; i++) {
+
+      console.log(stations[i].stationNo)
+
+      var context = await chkContext(stations[i].stationNo, stations[i].accountDuz)
+      if (context) {
+
+        var test = context[1]
+
+        if (test[1] == 'CDSP RPC CONTEXT') {
+          console.log(test)
+          addRes(context)
+          count++
+
+        }
       }
     }
   }
   catch (error) {
     console.error(error)
-  
+
   }
-  console.log(count +' of '+stations.length)
+  console.log(count + ' of ' + stations.length)
   const ws = fs.createWriteStream("results.csv");
   fastcsv
     .write(comRes, { headers: false })
