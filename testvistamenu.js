@@ -11,21 +11,21 @@ const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
 
 function getComInfo(stationNo,duz){
 
-    return new Promise(function(resolve,reject){
-    axios.post(config.vistaApi.tokenUrl,
-            {
-              "key":config.key,
-              "stationNo": stationNo,
-              "duz": duz
-                        }).then(function(data){
-          
-              axios.post(config.vistaApi.url,                
+  return new Promise(function (resolve, reject) {
+    axios.post(config.VistaApiX.tokenUrl,
+      {
+        "key":config.KeyX
+            }).then(function (data) {
+              console.log
+              axios.post(config.VistaApiX.url+'/vista-sites/'+stationNo+'/users/'+duz+'/rpc/invoke',
                 {
                   "context" : "OR CPRS GUI CHART",
                   "rpc" : "ORWU TOOLMENU", //ORWCOM GETOBJS
-                  "jsonResult" : "false",
+                  "jsonResult" : false,
                   "parameters" : []
-                 },{  headers:{'authorization':'Bearer '+data.data.payload.token},}
+                }
+              
+                , { headers: { 'authorization': 'Bearer ' + data.data.data.token }, }
                 ).then(function(data){
            
                   var jsonData = data.data;
