@@ -1,12 +1,13 @@
+
 var axios = require('axios');
 const fastcsv = require('fast-csv');
 const fs = require('fs');
 var parse = require('csv-parse');
-const config = require('./config');
-const cliProgress = require('cli-progress');
-const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+const config = require('./configvista');
+
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+
 function getComInfo(stationNo, duz) {
 
   return new Promise(function (resolve, reject) {
@@ -21,7 +22,7 @@ function getComInfo(stationNo, duz) {
           {
 
             "context": "OR CPRS GUI CHART",
-            "rpc": "ORWCOM GETOBJS", //ORWCOM GETOBJS
+            "rpc": "ORWCOM PTOBJ", //ORWCOM GETOBJS //ORWCOM PTOBJ
             "jsonResult": "false",
             "parameters": []
 
@@ -77,23 +78,26 @@ const doConfig = async () => {
 
   try {
     var stations = await getStations()
-    bar1.start(stations.length, 0);
+    console.log(stations.length)
+    console.log('url: ' + config.vistaApi.url)
     for (var i = 0; i < stations.length; i++) {
+
+      console.log(stations[i].stationNo, stations[i].accountDuz)
       var comInfo = await getComInfo(stations[i].stationNo, stations[i].accountDuz)
 
       if (comInfo) {
+        console.log(comInfo)
+        comInfo.push(stations[i].stationNo)
         addRes(comInfo)
       } else {
       }
-      bar1.increment()
     }
   }
   catch (error) {
     console.error(error)
     error_log(error)
   }
-  
-  const ws = fs.createWriteStream("results.csv");
+  const ws = fs.createWriteStream("results2.csv");
   fastcsv
     .write(comRes, { headers: false })
     .pipe(ws);
